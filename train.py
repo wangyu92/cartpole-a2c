@@ -17,19 +17,22 @@ LEARNING_RATE   = 5e-4
 GAMMA           = 0.99
 
 def test_model(model):
+    model.eval()
     env = gym.make('CartPole-v1')
 
-    score = 0.
+    score = [0.]
 
-    s = env.reset()
-    while True:
-        a = model.action(s)
-        s, r, d, _ = env.step(a)
-        score += r
-        if d:
-            break
+    for _ in range(20):
+        s = env.reset()
+        while True:
+            a = model.action(s)
+            s, r, d, _ = env.step(a)
+            score[-1] += r
+            if d:
+                score.append(0.)
+                break
 
-    return score
+    return np.mean(score)
 
 def compute_adv(rewards, values, dones, value_n):
     returns = np.append(np.zeros_like(rewards), [value_n], axis=-1)
